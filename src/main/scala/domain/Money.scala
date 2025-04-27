@@ -10,7 +10,7 @@ object Currency {
     override def toString: String = symbol.toString
   }
 }
-case class Money(value: BigDecimal, currency: Currency = Currency.USD) {
+case class Money(value: BigDecimal = 0, currency: Currency = Currency.USD) {
   def +(other: Money) = Money(this.value + other.value)
   def -(other: Money) = Money(this.value - other.value)
 

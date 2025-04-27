@@ -1,5 +1,6 @@
 package domain
 
+import domain.Currency.USD
 import domain.UserSpec.test
 import zio.test._
 import zio.test.Assertion._
@@ -24,6 +25,12 @@ object UserSpec extends ZIOSpecDefault {
       val result = User.validatePerson("Mayur")
       val id = result.toOption.map(_.id.isInstanceOf[UUID])
       assertTrue(id == Option(true))
-    }
+    },
+
+    test("should create user with empty wallet with 0 USD") {
+      val user = User("TestUser")
+      assertTrue(user.wallet.id.isInstanceOf[UUID])
+      assertTrue(user.balance == Money(BigDecimal(0), USD))
+    },
   )
 }
