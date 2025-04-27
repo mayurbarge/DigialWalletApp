@@ -9,6 +9,6 @@ case class User(name: String, wallet: Wallet = Wallet()) {
 object User {
   def validateName(name: String): Validation[String, String] =
     Validation.fromPredicateWith("Name can not be empty.")(name)(_.nonEmpty)
-  def validatePerson(name: String): Validation[String, User] =
+  def validateUser(name: String): Validation[String, User] =
     validateName(name).map(User(_))
 }

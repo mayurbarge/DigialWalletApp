@@ -1,11 +1,9 @@
 package domain
 
 import domain.Currency.USD
-import domain.UserSpec.test
-import zio.test._
-import zio.test.Assertion._
-import zio.prelude.Validation
 import io.jvm.uuid._
+import zio.prelude.Validation
+import zio.test._
 
 object UserSpec extends ZIOSpecDefault {
   override def spec = suite("UserSpec")(
@@ -22,7 +20,7 @@ object UserSpec extends ZIOSpecDefault {
     },
 
     test("should create user with valid uuid when name is valid") {
-      val result = User.validatePerson("Mayur")
+      val result = User.validateUser("Mayur")
       val id = result.toOption.map(_.id.isInstanceOf[UUID])
       assertTrue(id == Option(true))
     },
