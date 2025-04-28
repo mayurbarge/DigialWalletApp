@@ -2,8 +2,12 @@ package repository
 
 import domain.Payment
 import zio.{Ref, UIO}
-class PaymentRepository {
+
+object PaymentRepository {
   type PaymentState = Ref[List[Payment]]
+}
+class PaymentRepository {
+  import repository.PaymentRepository._
   def make: UIO[PaymentState] =
     Ref.make(List.empty[Payment])
 

@@ -10,11 +10,12 @@ object Currency {
     override def toString: String = symbol.toString
   }
 }
-case class Money(value: BigDecimal = 0, currency: Currency = Currency.USD) {
+case class Money(value: BigDecimal = 0, currency: Currency = Currency.USD) extends Ordered[Money] {
   def +(other: Money) = Money(this.value + other.value)
   def -(other: Money) = Money(this.value - other.value)
 
   override def toString: String = value.toString + currency.toString
+  override def compare(that: Money): Int = this.value.compare(that.value)
 }
 object Money {
   def validateMoney(value: BigDecimal) = {
