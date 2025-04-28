@@ -1,24 +1,21 @@
 package repository
 import domain.{Money, User}
 import zio._
-class UserRepository {
+object UserRepository {
   type UserState = Ref[List[User]]
+}
+class UserRepository {
+  import UserRepository._
   def make: UIO[UserState] =
     Ref.make(List.empty[User])
-
   def addUser(ref: UserState, user: User): ZIO[Any, String, Unit] = {
     for {
-      users <- ref.get
-      _ <-
-        if(users.exists(_.name == user.name))
-          ZIO.fail("User already present.")
-        else
-          ref.update(users => user :: users)
+      _ <- ref.get
+      _ <- ref.update(users => user :: users)
     } yield ()
   }
   def getUsers(ref: UserState): UIO[List[User]] =
     ref.get
-
   def updateMoney(ref: UserState, username: String, newMoney: Money): UIO[Unit] =
     ref.update { users =>
       users.map {
