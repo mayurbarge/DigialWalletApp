@@ -5,6 +5,7 @@ import domain.{Money, User, Wallet}
 import zio._
 import zio.test._
 import zio.test.Assertion._
+
 object UserRepositorySpec extends ZIOSpecDefault {
   override def spec = suite("UserRepositorySpec") (
     test("should add user to the repository if not already added") {
