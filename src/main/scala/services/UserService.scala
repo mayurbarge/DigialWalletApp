@@ -1,6 +1,6 @@
 package services
 
-import domain.User
+import domain.{Money, User}
 import repository.UserRepository
 import repository.UserRepository.UserState
 import zio.ZIO
@@ -20,9 +20,13 @@ class UserService(userRepository: UserRepository) {
   def findUser(ref: UserState, name: String) = {
     for {
       users <- userRepository.getUsers(ref)
-    } yield {
-      users.find(_.name == name)
-    }
+      user <- ZIO.fromOption(users.find(_.name == name)).orElseFail(s"User $name not found.")
+    } yield user
+  }
+  def topUpBalance(ref: UserState, name: String, topUpMoney: Money) = {
+    for {
+      _ <- userRepository.addMoney(ref, name, topUpMoney)
+    } yield ()
   }
 }
 

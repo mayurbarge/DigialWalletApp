@@ -21,8 +21,8 @@ object UserServiceSpec extends ZIOSpecDefault {
       }
       yield {
         assertTrue(
-          user.map(_.name).getOrElse("") == "Mayur",
-          user.map(_.balance).getOrElse(Money(BigDecimal(99))) == Money(BigDecimal(0))
+          user.name == "Mayur",
+          user.balance == Money(BigDecimal(0))
         )
       }
     },
@@ -50,6 +50,36 @@ object UserServiceSpec extends ZIOSpecDefault {
         }
         yield r
       assertZIO(result.exit)(fails(equalTo("User already present.")))
+    },
+
+    test("should fail when user is not found") {
+      val repository = new UserRepository()
+      val userService = new UserService(repository)
+      val result =
+        for {
+          ref <- repository.make
+          _ <- userService.findUser(ref, "Mayur")
+        }
+        yield ()
+      assertZIO(result.exit)(fails(equalTo("User Mayur not found.")))
+    },
+
+    test("should top up 5 USD to the users wallet having 10 USD") {
+      val repository = new UserRepository()
+      val userService = new UserService(repository)
+      for {
+        ref <- repository.make
+        _ <- userService.addUser(ref, "Mayur")
+        _ <- userService.topUpBalance(ref, "Mayur", Money(5, USD))
+        _ <- userService.topUpBalance(ref, "Mayur", Money(10, USD))
+        users <- repository.getUsers(ref)
+      }
+      yield {
+        assertTrue(
+          users.head.name == "Mayur",
+          users.head.balance == Money(15, USD)
+        )
+      }
     },
   )
 }

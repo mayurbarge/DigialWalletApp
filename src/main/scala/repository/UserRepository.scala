@@ -23,5 +23,12 @@ class UserRepository {
         case user => user
       }
     }
+  def addMoney(ref: UserState, username: String, newMoney: Money): UIO[Unit] =
+    ref.update { users =>
+      users.map {
+        case user if user.name == username => user.copy(wallet = user.wallet.copy(balance = user.balance + newMoney))
+        case user => user
+      }
+    }
 }
 
