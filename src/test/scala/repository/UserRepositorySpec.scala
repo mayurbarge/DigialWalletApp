@@ -1,10 +1,8 @@
 package repository
 
 import domain.Currency._
-import domain.{Money, User, Wallet}
-import zio._
+import domain.{Money, User}
 import zio.test._
-import zio.test.Assertion._
 
 object UserRepositorySpec extends ZIOSpecDefault {
   override def spec = suite("UserRepositorySpec") (

@@ -86,5 +86,52 @@ object PaymentServiceSpec extends ZIOSpecDefault {
         yield r
       assertZIO(result.exit)(fails(equalTo("Sender user 'Mayur' not found.")))
     },
+
+    test("should get all payments") {
+      val userRepository = new UserRepository()
+      val userService = new UserService(userRepository)
+      val paymentRepository = new PaymentRepository()
+      val paymentService = new PaymentService(userRepository, paymentRepository)
+
+      for {
+        usersRef <- userRepository.make
+        paymentsRef <- paymentRepository.make
+        _ <- userService.addUser(usersRef, "Mayur")
+        _ <- userService.addUser(usersRef, "Mahesh")
+        _ <- userRepository.updateMoney(usersRef, "Mayur", Money(BigDecimal(120), USD))
+        _ <- paymentService.transfer(usersRef, paymentsRef, "Mayur", "Mahesh", Money(BigDecimal(20), USD))
+        _ <- paymentService.transfer(usersRef, paymentsRef, "Mayur", "Mahesh", Money(BigDecimal(30), USD))
+        payments <- paymentService.getAllPayments(paymentsRef)
+      }
+      yield {
+        assertTrue(
+          payments.length == 2
+        )
+      }
+    },
+
+    test("should get all payments from user") {
+      val userRepository = new UserRepository()
+      val userService = new UserService(userRepository)
+      val paymentRepository = new PaymentRepository()
+      val paymentService = new PaymentService(userRepository, paymentRepository)
+
+      for {
+        usersRef <- userRepository.make
+        paymentsRef <- paymentRepository.make
+        _ <- userService.addUser(usersRef, "Mayur")
+        _ <- userService.addUser(usersRef, "Mahesh")
+        _ <- userRepository.updateMoney(usersRef, "Mayur", Money(BigDecimal(120), USD))
+        _ <- paymentService.transfer(usersRef, paymentsRef, "Mayur", "Mahesh", Money(BigDecimal(20), USD))
+        _ <- paymentService.transfer(usersRef, paymentsRef, "Mahesh", "Mayur", Money(BigDecimal(10), USD))
+        payments <- paymentService.getAllPaymentsByUser(usersRef, paymentsRef, "Mahesh")
+      }
+      yield {
+        assertTrue(
+          payments.length == 1,
+          payments.head.money == Money(BigDecimal(10))
+        )
+      }
+    },
   )
 }

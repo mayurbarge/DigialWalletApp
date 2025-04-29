@@ -28,4 +28,14 @@ class PaymentService(userRepository: UserRepository, paymentRepository: PaymentR
     } yield {
     }
   }
+  def getAllPayments(paymentRef: PaymentState) = paymentRepository.getPayments(paymentRef)
+
+  def getAllPaymentsByUser(userRef: UserState, paymentRef: PaymentState, user: String) = {
+    for {
+      users <- userRepository.getUsers(userRef)
+      payments <- paymentRepository.getPayments(paymentRef)
+      walletId <- ZIO.fromOption(users.find(_.name == user).map(_.wallet.id)).orElseFail("User not found.")
+    } yield payments.filter(_.fromWallet == walletId)
+  }
+
 }
